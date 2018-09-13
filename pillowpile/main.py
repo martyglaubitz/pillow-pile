@@ -1,16 +1,20 @@
+import configuration
+import handlers
+
 import tornado.ioloop
 import tornado.web
 
-class MainHandler(tornado.web.RequestHandler):
-    def get(self):
-        self.write("Hello, world")
 
-def make_app():
+
+
+def make_app(cfg: dict):
     return tornado.web.Application([
-        (r"/", MainHandler),
+        (r"/", handlers.MainHandler, dict(cfg=cfg)),
     ])
 
 if __name__ == "__main__":
-    app = make_app()
-    app.listen(8888)
+    cfg = configuration.read()
+
+    app = make_app(cfg)
+    app.listen(cfg['port'])
     tornado.ioloop.IOLoop.current().start()
