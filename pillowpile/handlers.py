@@ -6,4 +6,4 @@ class MainHandler(tornado.web.RequestHandler):
 
     async def get(self):
         self.set_header('Content-Type', 'application/json')
-        self.write(self.cfg)
+        self.write({'hello': 'world'})

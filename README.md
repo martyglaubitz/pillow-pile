@@ -6,5 +6,4 @@ A proxy to enable hierarchical documents in CouchDB
     python -m venv venv
 #### Install Dev dependencies  
     pip install tornado
-    pip install pyyaml
 
