@@ -8,7 +8,7 @@ import tornado.web
 
 def make_app(couchdb_url: str, debug: bool):
     return tornado.web.Application([
-        (r"/", handlers.MainHandler, dict(server_url=couchdb_url, call_impl=couch_client.default_call)),
+        (r"/(.*)", handlers.MainHandler, dict(server_url=couchdb_url, call_impl=couch_client.default_call)),
     ], debug=debug)
 
 if __name__ == "__main__":

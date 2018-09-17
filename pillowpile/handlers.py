@@ -2,23 +2,21 @@ import couch_client
 
 import tornado.web
 import typing
-import urllib.parse
 
 class MainHandler(tornado.web.RequestHandler):
 
-    def db_name(self):
-        split_result = urllib.parse.urlsplit(self.request.uri)
-        path_parts = split_result.path.split('/')
+    def get_path_components(self, path):
+        return path.split('/')
 
-        if len(path_parts) >= 2:
-            return path_parts[1]
+    def db_name(self, path):
+        path_parts = self.get_path_components(path)
+
+        if path_parts:
+            return path_parts[0]
 
         return None
 
-    async def get_client(self):
-        db_name = self.db_name()
-        print('db: ' + db_name)
-
+    def get_client(self, db_name):
         if not db_name in self.clients:
             client = couch_client.Client(self.server_url, db_name, self.call_impl)
             self.clients[db_name] = client
@@ -30,5 +28,11 @@ class MainHandler(tornado.web.RequestHandler):
         self.clients = {}
         self.server_url = server_url
 
-    async def get(self):
-        client = self.get_client()
+    async def get(self, path):
+        db_name = self.db_name(path)
+        client = self.get_client(db_name)
+        graph = await client.get_graph()
+        self.finish(graph)
+
+
+
