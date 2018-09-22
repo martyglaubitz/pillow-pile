@@ -30,6 +30,8 @@ class MainHandler(tornado.web.RequestHandler):
 
     async def get(self, path):
         db_name = self.db_name(path)
+        path_components = self.get_path_components(path)
+        print(path_components)
         client = self.get_client(db_name)
         graph = await client.get_graph()
         self.finish(graph)
