@@ -16,4 +16,25 @@ A proxy to enable hierarchical documents in CouchDB
 .\venv\Scripts\activate #on windows
 python .\pillowpile\main.py --couchdb_url="http://localhost:32769" --debug 
 ```
-           
+
+# REST API
+## Databases  
+
+To create a database:  
+**PUT (NO BODY)** http://localhost:8080/my-database  
+
+To delete a database:  
+**DELETE (NO BODY)** http://localhost:8080/my-database  
+
+## Documents
+To access a document:  
+**GET** http://localhost:8080/my-database/my/document/path  
+
+To create or update a document:  
+**PUT (JSON)** http://localhost:8080/my-database/my/document/path  
+
+To delete a document:  
+**DELETE (NO BODY)** http://localhost:8080/my-database/my/document/path
+
+## Index
+**GET** http://localhost:8080/my-database/index
