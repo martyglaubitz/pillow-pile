@@ -1,3 +1,24 @@
+import urllib.parse
+
+def create_index(graph_json: dict, base_url: str):
+    result = dict()
+
+    for key, value in graph_json.items():
+        if type(value) is str:
+            continue 
+
+        item_url = base_url + '/'+ key
+        entry = dict()
+        if 'id' in value:
+            entry['url'] = item_url
+
+        subpages = create_index(value, item_url)
+        entry.update(subpages)
+
+        result[key] = entry
+
+    return result
+
 def get_document_entry_for_path(graph_json: dict, path_components: list, return_copys=True):
     last_path_component = path_components[-1]
     parent_doc = graph_json

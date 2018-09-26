@@ -51,6 +51,16 @@ class BaseHandler(tornado.web.RequestHandler):
         self.clients = {}
         self.server_url = server_url
 
+class IndexHandler(BaseHandler):
+    async def get(self, db_name):
+        client = self.get_client(db_name)
+        code, graph_obj = await client.get_graph()
+        if code not in ITEM_EXISTS_RANGE:
+            self.finish_not_found('Database with name "' + db_name + '" does not exist')
+
+        self.set_status(200)
+        self.finish(graph.create_index(graph_obj, self.request.host + '/' + db_name))
+
 class DatabaseHandler(BaseHandler):
 
     async def delete(self, db_name):
@@ -94,7 +104,7 @@ class MainHandler(BaseHandler):
 
         doc_ref, _, _ = graph.get_document_entry_for_path(graph_obj, path_components)
         if not graph.delete_doc_node_from_graph(graph_obj, path_components):
-            return self.finish_not_found('Document with path"' + path + '" does not exists.')
+            return self.finish_not_found('Document with path "' + path + '" does not exists.')
 
         response_code, delete_response = await client.delete_doc(graph_obj, doc_ref)
         self.finish_with_original_response(response_code, delete_response)    
@@ -107,12 +117,12 @@ class MainHandler(BaseHandler):
             return self.finish_not_found('Database with name "' + db_name + '" does not exist')
 
         doc_ref, _, _ = graph.get_document_entry_for_path(graph_obj, path_components)
-        if not doc_ref:
-            return self.finish_not_found('Document with path"' + path + '" does not exists.')
+        if not doc_ref or 'id' not in doc_ref:
+            return self.finish_not_found('Document with path "' + path + '" does not exists.')
 
         response_code, doc = await client.get_doc(doc_ref)
         if response_code == 404:
-            return self.finish_not_found('Document with path"' + path + '" does not exists.')
+            return self.finish_not_found('Document with path "' + path + '" does not exists.')
 
         doc.pop('_id', None)
         doc.pop('_rev', None)
@@ -134,7 +144,7 @@ class MainHandler(BaseHandler):
         if doc_ref and 'id' in doc_ref:
             response_code, update_response = await client.update_existing_doc(doc_ref, request_body)
             if response_code == 201:
-                return self.finish_ok('Document with path"' + path + '" has been updated.')
+                return self.finish_ok('Document with path "' + path + '" has been updated.')
             else:
                 return self.finish_with_original_response(response_code, update_response)
                 
